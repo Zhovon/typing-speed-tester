@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypingLab AI Studio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-light: #e8f0fe;
+            --secondary: #5f6368;
+            --background: #ffffff;
+            --surface: #f8f9fa;
+            --error: #ea4335;
+            --success: #34a853;
+            --warning: #fbbc04;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--background);
+            color: #202124;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .code-font {
+            font-family: 'Roboto Mono', monospace;
+        }
+        
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid #dadce0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .chat-container {
+            height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+        
+        .user-message {
+            background: var(--primary-light);
+            border-radius: 12px;
+            border-top-right-radius: 4px;
+        }
+        
+        .ai-message {
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 12px;
+            border-top-left-radius: 4px;
+        }
+        
+        .typing-area {
+            border: 1px solid #dadce0;
+            border-radius: 12px;
+            resize: none;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .typing-area:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+        
+        .stats-card {
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .stats-card:hover {
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background: #e8eaed;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background: #1669d6;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8f9fa;
+        }
+        
+        .highlight-correct {
+            color: var(--success);
+        }
+        
+        .highlight-incorrect {
+            color: var(--error);
+            text-decoration: underline;
+        }
+        
+        .highlight-current {
+            background: rgba(26, 115, 232, 0.1);
+            border-radius: 2px;
+        }
+        
+        .test-active {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+        }
+        
+        .nav-item {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .nav-item:hover {
+            background: #f1f3f4;
+        }
+        
+        .nav-item.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        
+        .floating-stats {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            background: white;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 16px;
+            min-width: 200px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="sidebar w-64 flex-shrink-0">
+        <div class="p-4 border-b border-dadce0">
+            <h1 class="text-xl font-semibold text-gray-800 flex items-center">
+                <i class="fas fa-keyboard mr-2 text-blue-500"></i>
+                TypingLab AI
+            </h1>
+            <p class="text-sm text-gray-600 mt-1">Analyze & Improve Your Typing</p>
+        </div>
+        
+        <div class="p-4">
+            <button class="btn-primary w-full mb-4" id="new-session-btn">
+                <i class="fas fa-plus mr-2"></i>New Session
+            </button>
+            
+            <div class="space-y-1">
+                <div class="nav-item active">
+                    <i class="fas fa-bolt mr-2"></i>Speed Test
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-line mr-2"></i>Progress Analytics
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-graduation-cap mr-2"></i>Lessons
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-trophy mr-2"></i>Achievements
+                </div>
+            </div>
+            
+            <div class="mt-8">
+                <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Recent Sessions</h3>
+                <div class="space-y-2">
+                    <div class="text-sm p-2 rounded hover:bg-gray-50 cursor-pointer">
+                        <div class="font-medium">Speed Focus</div>
+                        <div class="text-xs text-gray-500">Today, 45 WPM</div>
+                    </div>
+                    <div class="text-sm p-2 rounded hover:bg-gray-50 cursor-pointer">
+                        <div class="font-medium">Accuracy Practice</div>
+                        <div class="text-xs text-gray-500">Yesterday, 98% accuracy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Header -->
+        <header class="border-b border-dadce0 px-6 py-4">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-lg font-medium">Typing Speed Test</h2>
+                    <p class="text-sm text-gray-600">Test and analyze your typing performance</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="text-sm">
+                        <span class="text-gray-600">Current WPM:</span>
+                        <span class="font-medium" id="current-wpm">0</span>
+                    </div>
+                    <div class="text-sm">
+                        <span class="text-gray-600">Accuracy:</span>
+                        <span class="font-medium" id="current-accuracy">100%</span>
+                    </div>
+                    <button class="btn-secondary" id="settings-btn">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content Area -->
+        <div class="flex-1 flex">
+            <!-- Chat/Test Area -->
+            <div class="flex-1 p-6">
+                <div class="max-w-4xl mx-auto">
+                    <!-- Test Configuration -->
+                    <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium text-blue-800">Test Configuration</h3>
+                                <p class="text-sm text-blue-600">Customize your typing test parameters</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select class="border rounded px-3 py-1 text-sm" id="duration-select">
+                                    <option value="30">30 seconds</option>
+                                    <option value="60" selected>60 seconds</option>
+                                    <option value="120">2 minutes</option>
+                                    <option value="300">5 minutes</option>
+                                </select>
+                                <select class="border rounded px-3 py-1 text-sm" id="difficulty-select">
+                                    <option value="easy">Easy</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="hard">Hard</option>
+                                    <option value="expert">Expert</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Test Area -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <div class="text-sm text-gray-600">
+                                <span id="time-remaining">60s remaining</span>
+                                <span class="mx-2">•</span>
+                                <span id="words-count">0 words</span>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="btn-secondary text-sm" id="reset-test-btn">
+                                    <i class="fas fa-redo mr-1"></i>Reset
+                                </button>
+                                <button class="btn-primary text-sm" id="start-test-btn">
+                                    <i class="fas fa-play mr-1"></i>Start Test
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="typing-area p-4 mb-4 min-h-[120px] test-active" id="typing-text">
+                            Press the "Start Test" button to begin. You'll have 60 seconds to type the text that appears here.
+                        </div>
+                        
+                        <textarea 
+                            class="typing-area w-full p-4" 
+                            id="typing-input" 
+                            placeholder="Start typing here when the test begins..." 
+                            rows="4"
+                            disabled
+                        ></textarea>
+                    </div>
+                    
+                    <!-- AI Feedback -->
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-4">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                <i class="fas fa-robot text-blue-500"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">TypingLab AI Assistant</h4>
+                                <p class="text-sm text-gray-600">Real-time feedback and suggestions</p>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-700" id="ai-feedback">
+                            Ready to analyze your typing performance. Start the test to receive personalized feedback.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Panel -->
+            <div class="w-80 border-l border-dadce0 p-6 overflow-y-auto">
+                <h3 class="font-medium mb-4">Performance Metrics</h3>
+                
+                <div class="space-y-4">
+                    <div class="stats-card p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium">Words Per Minute</span>
+                            <span class="text-lg font-bold text-blue-600" id="stats-wpm">0</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="wpm-progress" style="width: 0%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">Goal: 60 WPM</div>
+                    </div>
+                    
+                    <div class="stats-card p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium">Accuracy</span>
+                            <span class="text-lg font-bold text-green-600" id="stats-accuracy">100%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-green-500" id="accuracy-progress" style="width: 100%"></div>
+                        </div>
+                        <div class="text-xs text-gray-500 mt-1">Target: 95%+</div>
+                    </div>
+                    
+                    <div class="stats-card p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium">Characters Typed</span>
+                            <span class="text-lg font-bold text-purple-600" id="stats-chars">0</span>
+                        </div>
+                        <div class="text-xs text-gray-500">Total characters in this session</div>
+                    </div>
+                    
+                    <div class="stats-card p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-medium">Errors</span>
+                            <span class="text-lg font-bold text-red-600" id="stats-errors">0</span>
+                        </div>
+                        <div class="text-xs text-gray-500">Mistakes made in this session</div>
+                    </div>
+                    
+                    <div class="stats-card p-4">
+                        <h4 class="text-sm font-medium mb-3">Common Error Patterns</h4>
+                        <div class="text-xs space-y-2" id="error-patterns">
+                            <div class="text-gray-500">No errors detected yet</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-card p-4">
+                        <h4 class="text-sm font-medium mb-3">Improvement Suggestions</h4>
+                        <div class="text-xs space-y-2" id="improvement-suggestions">
+                            <div class="text-gray-500">Complete a test to get suggestions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Stats Panel (Mobile) -->
+    <div class="floating-stats hidden" id="floating-stats">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-medium">Current WPM</span>
+            <span class="font-bold text-blue-600" id="floating-wpm">0</span>
+        </div>
+        <div class="flex justify-between items-center">
+            <span class="text-sm font-medium">Accuracy</span>
+            <span class="font-bold text-green-600" id="floating-accuracy">100%</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const typingText = document.getElementById('typing-text');
+            const typingInput = document.getElementById('typing-input');
+            const startTestBtn = document.getElementById('start-test-btn');
+            const resetTestBtn = document.getElementById('reset-test-btn');
+            const durationSelect = document.getElementById('duration-select');
+            const difficultySelect = document.getElementById('difficulty-select');
+            const timeRemaining = document.getElementById('time-remaining');
+            const wordsCount = document.getElementById('words-count');
+            const aiFeedback = document.getElementById('ai-feedback');
+            
+            // Stats elements
+            const currentWpm = document.getElementById('current-wpm');
+            const currentAccuracy = document.getElementById('current-accuracy');
+            const statsWpm = document.getElementById('stats-wpm');
+            const statsAccuracy = document.getElementById('stats-accuracy');
+            const statsChars = document.getElementById('stats-chars');
+            const statsErrors = document.getElementById('stats-errors');
+            const wpmProgress = document.getElementById('wpm-progress');
+            const accuracyProgress = document.getElementById('accuracy-progress');
+            const errorPatterns = document.getElementById('error-patterns');
+            const improvementSuggestions = document.getElementById('improvement-suggestions');
+            const floatingStats = document.getElementById('floating-stats');
+            const floatingWpm = document.getElementById('floating-wpm');
+            const floatingAccuracy = document.getElementById('floating-accuracy');
+            
+            // Test variables
+            let testActive = false;
+            let timer;
+            let timeLeft = 60;
+            let startTime;
+            let currentText = '';
+            let currentMode = 'medium';
+            
+            // Stats
+            let correctChars = 0;
+            let totalChars = 0;
+            let errors = 0;
+            let errorMap = new Map();
+            
+            // Text samples for different difficulty levels
+            const textSamples = {
+                easy: [
+                    "The quick brown fox jumps over the lazy dog. This sentence contains every letter in the alphabet.",
+                    "Programming is the process of creating a set of instructions that tell a computer how to perform a task.",
+                    "Learning to type quickly and accurately is an important skill in today's digital world.",
+                    "Practice makes perfect when it comes to improving your typing speed and accuracy over time."
+                ],
+                medium: [
+                    "JavaScript is a high-level, often just-in-time compiled language that conforms to the ECMAScript specification.",
+                    "Responsive web design makes your web page look good on all devices. It uses only HTML and CSS.",
+                    "The Document Object Model (DOM) is a programming interface for web documents that represents the structure.",
+                    "Asynchronous programming allows a unit of work to run separately from the primary application thread."
+                ],
+                hard: [
+                    "Polymorphism is the ability of an object to take on many forms. The most common use is when a parent class reference refers to a child class object.",
+                    "Cryptographic hash functions are mathematical operations that take input data of any size and produce a fixed-size output string.",
+                    "Quantum computing utilizes quantum mechanical phenomena to perform operations on data at exponentially faster rates than classical computers."
+                ],
+                expert: [
+                    "The juxtaposition of postmodern architectural elements with classical facades creates a dialectical tension that challenges conventional aesthetic paradigms.",
+                    "Epistemological skepticism questions the possibility of knowledge, arguing that our cognitive faculties may be fundamentally unreliable.",
+                    "Quantum entanglement describes a phenomenon where particles remain connected so that actions performed on one affect the other, regardless of distance."
+                ]
+            };
+            
+            // AI Feedback messages
+            const aiMessages = {
+                start: "I'm ready to analyze your typing! Begin the test and I'll provide real-time feedback.",
+                goodStart: "Good start! You're maintaining a steady pace. Try to focus on accuracy as you continue.",
+                speedUp: "You're doing well, but you could increase your speed slightly. Don't sacrifice accuracy though!",
+                slowDown: "You're making several errors. Try slowing down to improve your accuracy first.",
+                excellent: "Excellent performance! You're maintaining both speed and accuracy. Keep it up!",
+                finish: "Test complete! Let me analyze your overall performance..."
+            };
+            
+            // Initialize the application
+            function init() {
+                // Set up event listeners
+                startTestBtn.addEventListener('click', startTest);
+                resetTestBtn.addEventListener('click', resetTest);
+                typingInput.addEventListener('input', handleTyping);
+                durationSelect.addEventListener('change', updateDuration);
+                difficultySelect.addEventListener('change', updateDifficulty);
+                
+                // Initial setup
+                updateDuration();
+                updateDisplayText();
+                
+                // Show initial AI message
+                updateAIFeedback(aiMessages.start);
+            }
+            
+            // Start the typing test
+            function startTest() {
+                if (testActive) return;
+                
+                testActive = true;
+                startTestBtn.disabled = true;
+                typingInput.disabled = false;
+                typingInput.focus();
+                typingText.classList.add('test-active');
+                
+                // Reset stats
+                correctChars = 0;
+                totalChars = 0;
+                errors = 0;
+                errorMap.clear();
+                updateStats();
+                
+                // Start timer
+                timeLeft = parseInt(durationSelect.value);
+                timeRemaining.textContent = `${timeLeft}s remaining`;
+                startTime = new Date();
+                
+                timer = setInterval(function() {
+                    timeLeft--;
+                    timeRemaining.textContent = `${timeLeft}s remaining`;
+                    
+                    if (timeLeft <= 0) {
+                        endTest();
+                    }
+                }, 1000);
+                
+                // Update display text
+                updateDisplayText();
+                
+                // Update AI feedback
+                updateAIFeedback("Test started! Focus on maintaining a balance between speed and accuracy.");
+                
+                // Show floating stats on mobile
+                if (window.innerWidth < 768) {
+                    floatingStats.classList.remove('hidden');
+                }
+            }
+            
+            // Reset the test
+            function resetTest() {
+                clearInterval(timer);
+                testActive = false;
+                startTestBtn.disabled = false;
+                typingInput.disabled = true;
+                typingInput.value = '';
+                typingText.classList.remove('test-active');
+                
+                // Reset time
+                timeLeft = parseInt(durationSelect.value);
+                timeRemaining.textContent = `${timeLeft}s remaining`;
+                
+                // Reset stats
+                correctChars = 0;
+                totalChars = 0;
+                errors = 0;
+                errorMap.clear();
+                updateStats();
+                
+                // Update display text
+                updateDisplayText();
+                
+                // Update AI feedback
+                updateAIFeedback(aiMessages.start);
+                
+                // Hide floating stats
+                floatingStats.classList.add('hidden');
+            }
+            
+            // End the test and show results
+            function endTest() {
+                clearInterval(timer);
+                testActive = false;
+                startTestBtn.disabled = false;
+                typingInput.disabled = true;
+                typingText.classList.remove('test-active');
+                
+                // Calculate final stats
+                const endTime = new Date();
+                const timeTaken = (endTime - startTime) / 1000 / 60; // in minutes
+                const finalWpm = Math.round((correctChars / 5) / timeTaken);
+                const finalAccuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+                
+                // Update AI feedback with analysis
+                let analysis = "Test complete! ";
+                
+                if (finalWpm < 30) {
+                    analysis += "Your speed is on the beginner level. Focus on practicing regularly to build muscle memory.";
+                } else if (finalWpm < 50) {
+                    analysis += "You're at an intermediate level. Good job! Try to push for 60 WPM with maintained accuracy.";
+                } else if (finalWpm < 80) {
+                    analysis += "Excellent speed! You're typing faster than most people. Keep practicing to reach expert level.";
+                } else {
+                    analysis += "Outstanding! You're typing at an expert level. Consider competing in typing competitions!";
+                }
+                
+                if (finalAccuracy < 90) {
+                    analysis += " Your accuracy needs improvement. Slow down slightly to reduce errors.";
+                } else if (finalAccuracy < 95) {
+                    analysis += " Good accuracy. Try to maintain this while gradually increasing speed.";
+                } else {
+                    analysis += " Your accuracy is excellent! You have great control over your typing.";
+                }
+                
+                updateAIFeedback(analysis);
+                
+                // Generate improvement suggestions
+                generateImprovementSuggestions(finalWpm, finalAccuracy);
+                
+                // Hide floating stats after a delay
+                setTimeout(() => {
+                    floatingStats.classList.add('hidden');
+                }, 3000);
+            }
+            
+            // Handle typing input
+            function handleTyping() {
+                if (!testActive) return;
+                
+                const inputText = typingInput.value;
+                totalChars = inputText.length;
+                
+                // Calculate correct characters and errors
+                correctChars = 0;
+                errors = 0;
+                
+                for (let i = 0; i < inputText.length; i++) {
+                    if (i < currentText.length && inputText[i] === currentText[i]) {
+                        correctChars++;
+                    } else {
+                        errors++;
+                        // Track error patterns
+                        if (i < currentText.length) {
+                            const expectedChar = currentText[i];
+                            const typedChar = inputText[i];
+                            const errorKey = `${expectedChar}->${typedChar}`;
+                            errorMap.set(errorKey, (errorMap.get(errorKey) || 0) + 1);
+                        }
+                    }
+                }
+                
+                // Update stats
+                updateStats();
+                
+                // Update text highlighting
+                updateTextHighlighting(inputText);
+                
+                // Update word count
+                const wordCount = inputText.split(/\s+/).filter(word => word.length > 0).length;
+                wordsCount.textContent = `${wordCount} words`;
+                
+                // Update AI feedback based on performance
+                updateRealTimeAIFeedback();
+                
+                // Check if user has completed the text
+                if (inputText === currentText) {
+                    updateDisplayText();
+                    typingInput.value = '';
+                }
+            }
+            
+            // Update stats display
+            function updateStats() {
+                // Calculate WPM
+                const timeElapsed = (parseInt(durationSelect.value) - timeLeft) / 60; // in minutes
+                const wpm = timeElapsed > 0 ? Math.round((correctChars / 5) / timeElapsed) : 0;
+                
+                // Calculate accuracy
+                const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+                
+                // Update all stat elements
+                currentWpm.textContent = wpm;
+                currentAccuracy.textContent = accuracy + '%';
+                statsWpm.textContent = wpm;
+                statsAccuracy.textContent = accuracy + '%';
+                statsChars.textContent = totalChars;
+                statsErrors.textContent = errors;
+                
+                // Update progress bars
+                wpmProgress.style.width = Math.min(wpm, 100) + '%';
+                accuracyProgress.style.width = accuracy + '%';
+                
+                // Update floating stats
+                floatingWpm.textContent = wpm;
+                floatingAccuracy.textContent = accuracy + '%';
+                
+                // Update error patterns
+                updateErrorPatterns();
+            }
+            
+            // Update text highlighting based on user input
+            function updateTextHighlighting(inputText) {
+                let highlightedText = '';
+                
+                for (let i = 0; i < currentText.length; i++) {
+                    if (i < inputText.length) {
+                        if (inputText[i] === currentText[i]) {
+                            highlightedText += `<span class="highlight-correct">${currentText[i]}</span>`;
+                        } else {
+                            highlightedText += `<span class="highlight-incorrect">${currentText[i]}</span>`;
+                        }
+                    } else if (i === inputText.length) {
+                        highlightedText += `<span class="highlight-current">${currentText[i]}</span>`;
+                    } else {
+                        highlightedText += currentText[i];
+                    }
+                }
+                
+                typingText.innerHTML = highlightedText;
+            }
+            
+            // Update the displayed text based on current mode
+            function updateDisplayText() {
+                const samples = textSamples[currentMode];
+                const randomIndex = Math.floor(Math.random() * samples.length);
+                currentText = samples[randomIndex];
+                
+                // Reset highlighting
+                typingText.innerHTML = currentText;
+                
+                // Clear input if test is active
+                if (testActive) {
+                    typingInput.value = '';
+                }
+            }
+            
+            // Update AI feedback in real-time
+            function updateRealTimeAIFeedback() {
+                const timeElapsed = parseInt(durationSelect.value) - timeLeft;
+                const wpm = timeElapsed > 0 ? Math.round((correctChars / 5) / (timeElapsed / 60)) : 0;
+                const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+                
+                let message = "";
+                
+                if (timeElapsed < 10) {
+                    message = aiMessages.goodStart;
+                } else if (wpm < 30 && accuracy > 95) {
+                    message = aiMessages.speedUp;
+                } else if (accuracy < 90) {
+                    message = aiMessages.slowDown;
+                } else if (wpm > 50 && accuracy > 95) {
+                    message = aiMessages.excellent;
+                } else {
+                    message = "You're maintaining a good pace. Keep focusing on both speed and accuracy.";
+                }
+                
+                updateAIFeedback(message);
+            }
+            
+            // Update AI feedback text
+            function updateAIFeedback(message) {
+                aiFeedback.textContent = message;
+            }
+            
+            // Update error patterns display
+            function updateErrorPatterns() {
+                if (errorMap.size === 0) {
+                    errorPatterns.innerHTML = '<div class="text-gray-500">No errors detected yet</div>';
+                    return;
+                }
+                
+                let html = '';
+                const sortedErrors = Array.from(errorMap.entries())
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5);
+                
+                sortedErrors.forEach(([pattern, count]) => {
+                    const [expected, typed] = pattern.split('->');
+                    html += `
+                        <div class="flex justify-between">
+                            <span class="font-mono">"${expected}" → "${typed}"</span>
+                            <span class="text-red-500">${count}x</span>
+                        </div>
+                    `;
+                });
+                
+                errorPatterns.innerHTML = html;
+            }
+            
+            // Generate improvement suggestions
+            function generateImprovementSuggestions(wpm, accuracy) {
+                let suggestions = [];
+                
+                if (wpm < 40) {
+                    suggestions.push("Practice with common words and phrases to build muscle memory");
+                }
+                
+                if (accuracy < 95) {
+                    suggestions.push("Slow down and focus on accuracy before trying to increase speed");
+                }
+                
+                if (errorMap.size > 0) {
+                    const mostCommonError = Array.from(errorMap.entries())[0];
+                    suggestions.push(`Pay special attention to typing "${mostCommonError[0].split('->')[0]}" correctly`);
+                }
+                
+                if (wpm >= 60 && accuracy >= 95) {
+                    suggestions.push("Try the 'Hard' or 'Expert' difficulty levels to challenge yourself further");
+                }
+                
+                if (suggestions.length === 0) {
+                    suggestions.push("Your typing is excellent! Consider practicing with specialized texts in your field");
+                }
+                
+                let html = '';
+                suggestions.forEach(suggestion => {
+                    html += `<div class="flex items-start">
+                        <i class="fas fa-lightbulb text-yellow-500 mt-0.5 mr-2"></i>
+                        <span>${suggestion}</span>
+                    </div>`;
+                });
+                
+                improvementSuggestions.innerHTML = html;
+            }
+            
+            // Update test duration
+            function updateDuration() {
+                timeLeft = parseInt(durationSelect.value);
+                if (!testActive) {
+                    timeRemaining.textContent = `${timeLeft}s remaining`;
+                }
+            }
+            
+            // Update difficulty level
+            function updateDifficulty() {
+                currentMode = difficultySelect.value;
+                if (!testActive) {
+                    updateDisplayText();
+                }
+            }
+            
+            // Initialize the application
+            init();
+        });
+    </script>
+</body>
+</html>

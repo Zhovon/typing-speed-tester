@@ -1,0 +1,15 @@
+{
+  "name": "typinglab-ai-studio",
+  "version": "1.0.0",
+  "description": "A Google AI Studio-inspired typing speed tester",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3000"
+  },
+  "keywords": ["typing", "speed-test", "ai", "analytics"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

@@ -178,6 +178,105 @@
         .page-section.active {
             display: block;
         }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        .setting-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .setting-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #202124;
+        }
+        
+        .setting-description {
+            font-size: 0.875rem;
+            color: #5f6368;
+            margin-bottom: 0.75rem;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
     </style>
 </head>
 <body class="flex h-screen">
@@ -578,6 +677,95 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-semibold">Settings</h3>
+                <button class="btn-secondary" id="close-settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Theme Settings -->
+                <div class="setting-group">
+                    <h4 class="setting-label">Theme</h4>
+                    <p class="setting-description">Choose your preferred color theme</p>
+                    <select class="border rounded px-3 py-2 w-full" id="theme-select">
+                        <option value="light">Light Theme</option>
+                        <option value="dark">Dark Theme</option>
+                        <option value="auto">Auto (System)</option>
+                    </select>
+                </div>
+                
+                <!-- Sound Settings -->
+                <div class="setting-group">
+                    <h4 class="setting-label">Sound Effects</h4>
+                    <p class="setting-description">Enable or disable typing sounds</p>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <div class="switch">
+                            <input type="checkbox" id="sound-toggle" checked>
+                            <span class="slider"></span>
+                        </div>
+                        <span class="text-sm">Play typing sounds</span>
+                    </label>
+                </div>
+                
+                <!-- Keyboard Settings -->
+                <div class="setting-group">
+                    <h4 class="setting-label">Keyboard Layout</h4>
+                    <p class="setting-description">Select your keyboard layout</p>
+                    <select class="border rounded px-3 py-2 w-full" id="keyboard-layout">
+                        <option value="qwerty">QWERTY (US)</option>
+                        <option value="qwerty-uk">QWERTY (UK)</option>
+                        <option value="azerty">AZERTY (French)</option>
+                        <option value="colemak">Colemak</option>
+                        <option value="dvorak">Dvorak</option>
+                    </select>
+                </div>
+                
+                <!-- Typing Mode -->
+                <div class="setting-group">
+                    <h4 class="setting-label">Typing Mode</h4>
+                    <p class="setting-description">Choose how errors are handled</p>
+                    <select class="border rounded px-3 py-2 w-full" id="typing-mode">
+                        <option value="normal">Normal (Continue on errors)</option>
+                        <option value="strict">Strict (Stop on errors)</option>
+                        <option value="practice">Practice (Highlight errors)</option>
+                    </select>
+                </div>
+                
+                <!-- Auto-save -->
+                <div class="setting-group">
+                    <h4 class="setting-label">Auto-save Progress</h4>
+                    <p class="setting-description">Automatically save your typing sessions</p>
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <div class="switch">
+                            <input type="checkbox" id="autosave-toggle" checked>
+                            <span class="slider"></span>
+                        </div>
+                        <span class="text-sm">Save sessions automatically</span>
+                    </label>
+                </div>
+                
+                <!-- Reset Data -->
+                <div class="setting-group">
+                    <h4 class="setting-label text-red-600">Danger Zone</h4>
+                    <p class="setting-description">Reset all your progress and settings</p>
+                    <button class="btn-secondary border-red-300 text-red-600 hover:bg-red-50 w-full" id="reset-data">
+                        <i class="fas fa-trash mr-2"></i>Reset All Data
+                    </button>
+                </div>
+            </div>
+            
+            <div class="flex justify-end space-x-3 mt-6">
+                <button class="btn-secondary" id="cancel-settings">Cancel</button>
+                <button class="btn-primary" id="save-settings">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Floating Stats Panel (Mobile) -->
     <div class="floating-stats hidden" id="floating-stats">
         <div class="flex justify-between items-center mb-2">
@@ -592,6 +780,90 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Settings Modal Functionality
+            const settingsBtn = document.getElementById('settings-btn');
+            const settingsModal = document.getElementById('settings-modal');
+            const closeSettings = document.getElementById('close-settings');
+            const cancelSettings = document.getElementById('cancel-settings');
+            const saveSettings = document.getElementById('save-settings');
+            const resetData = document.getElementById('reset-data');
+
+            // Open settings modal
+            settingsBtn.addEventListener('click', function() {
+                settingsModal.classList.add('active');
+            });
+
+            // Close settings modal
+            function closeSettingsModal() {
+                settingsModal.classList.remove('active');
+            }
+
+            closeSettings.addEventListener('click', closeSettingsModal);
+            cancelSettings.addEventListener('click', closeSettingsModal);
+
+            // Save settings
+            saveSettings.addEventListener('click', function() {
+                const theme = document.getElementById('theme-select').value;
+                const soundEnabled = document.getElementById('sound-toggle').checked;
+                const keyboardLayout = document.getElementById('keyboard-layout').value;
+                const typingMode = document.getElementById('typing-mode').value;
+                const autosave = document.getElementById('autosave-toggle').checked;
+
+                // Save settings to localStorage
+                localStorage.setItem('typingMaster-theme', theme);
+                localStorage.setItem('typingMaster-sound', soundEnabled);
+                localStorage.setItem('typingMaster-keyboard', keyboardLayout);
+                localStorage.setItem('typingMaster-mode', typingMode);
+                localStorage.setItem('typingMaster-autosave', autosave);
+
+                // Apply theme
+                applyTheme(theme);
+
+                // Show confirmation
+                alert('Settings saved successfully!');
+
+                closeSettingsModal();
+            });
+
+            // Reset data
+            resetData.addEventListener('click', function() {
+                if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+                    localStorage.clear();
+                    alert('All data has been reset. The page will reload.');
+                    location.reload();
+                }
+            });
+
+            // Apply theme function
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.body.classList.add('bg-gray-900', 'text-white');
+                } else {
+                    document.body.classList.remove('bg-gray-900', 'text-white');
+                }
+            }
+
+            // Load saved settings
+            function loadSettings() {
+                const theme = localStorage.getItem('typingMaster-theme') || 'light';
+                const soundEnabled = localStorage.getItem('typingMaster-sound') !== 'false';
+                const keyboardLayout = localStorage.getItem('typingMaster-keyboard') || 'qwerty';
+                const typingMode = localStorage.getItem('typingMaster-mode') || 'normal';
+                const autosave = localStorage.getItem('typingMaster-autosave') !== 'false';
+
+                document.getElementById('theme-select').value = theme;
+                document.getElementById('sound-toggle').checked = soundEnabled;
+                document.getElementById('keyboard-layout').value = keyboardLayout;
+                document.getElementById('typing-mode').value = typingMode;
+                document.getElementById('autosave-toggle').checked = autosave;
+
+                applyTheme(theme);
+            }
+
+            // Load settings when page loads
+            loadSettings();
+
+            // [Rest of your existing JavaScript code for navigation and typing test...]
             // Navigation functionality
             const navItems = document.querySelectorAll('.nav-item');
             const pageSections = document.querySelectorAll('.page-section');
@@ -655,6 +927,7 @@
                 resetTest();
             });
 
+            // [Rest of your existing typing test JavaScript...]
             // DOM Elements for typing test
             const typingText = document.getElementById('typing-text');
             const typingInput = document.getElementById('typing-input');

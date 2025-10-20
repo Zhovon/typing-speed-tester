@@ -933,7 +933,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Settings Modal Functionality
+            // ========== SETTINGS FUNCTIONALITY ==========
             const settingsBtn = document.getElementById('settings-btn');
             const settingsModal = document.getElementById('settings-modal');
             const closeSettings = document.getElementById('close-settings');
@@ -987,48 +987,14 @@
                 }
             });
 
-            // Apply theme function - COMPLETELY REWRITTEN
+            // Apply theme function
             function applyTheme(theme) {
                 const body = document.body;
                 
                 if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     body.classList.add('dark-theme');
-                    // Update all CSS variables for dark theme
-                    updateCSSVariables('dark');
                 } else {
                     body.classList.remove('dark-theme');
-                    // Update all CSS variables for light theme
-                    updateCSSVariables('light');
-                }
-            }
-
-            function updateCSSVariables(theme) {
-                const root = document.documentElement;
-                
-                if (theme === 'dark') {
-                    root.style.setProperty('--primary', '#8ab4f8');
-                    root.style.setProperty('--primary-light', '#1e3a5f');
-                    root.style.setProperty('--secondary', '#9aa0a6');
-                    root.style.setProperty('--background', '#0f0f0f');
-                    root.style.setProperty('--surface', '#1f1f1f');
-                    root.style.setProperty('--error', '#f28b82');
-                    root.style.setProperty('--success', '#81c995');
-                    root.style.setProperty('--warning', '#fdd663');
-                    root.style.setProperty('--text-primary', '#e8eaed');
-                    root.style.setProperty('--text-secondary', '#9aa0a6');
-                    root.style.setProperty('--border', '#3c4043');
-                } else {
-                    root.style.setProperty('--primary', '#1a73e8');
-                    root.style.setProperty('--primary-light', '#e8f0fe');
-                    root.style.setProperty('--secondary', '#5f6368');
-                    root.style.setProperty('--background', '#ffffff');
-                    root.style.setProperty('--surface', '#f8f9fa');
-                    root.style.setProperty('--error', '#ea4335');
-                    root.style.setProperty('--success', '#34a853');
-                    root.style.setProperty('--warning', '#fbbc04');
-                    root.style.setProperty('--text-primary', '#202124');
-                    root.style.setProperty('--text-secondary', '#5f6368');
-                    root.style.setProperty('--border', '#dadce0');
                 }
             }
 
@@ -1052,8 +1018,499 @@
             // Load settings when page loads
             loadSettings();
 
-            // [Rest of your existing JavaScript code remains exactly the same...]
-            // ... (all your existing navigation and typing test JavaScript)
+            // ========== NAVIGATION FUNCTIONALITY ==========
+            const navItems = document.querySelectorAll('.nav-item');
+            const pageSections = document.querySelectorAll('.page-section');
+            const pageTitle = document.getElementById('page-title');
+            const pageDescription = document.getElementById('page-description');
+            
+            // Page titles and descriptions
+            const pageData = {
+                'speed-test': {
+                    title: 'Typing Speed Test',
+                    description: 'Test and analyze your typing performance'
+                },
+                'progress-analytics': {
+                    title: 'Progress Analytics',
+                    description: 'Track your typing improvement over time'
+                },
+                'lessons': {
+                    title: 'Typing Lessons',
+                    description: 'Structured lessons to improve your skills'
+                },
+                'achievements': {
+                    title: 'Achievements',
+                    description: 'Unlock achievements and track your progress'
+                }
+            };
+            
+            // Navigation event listeners
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const pageId = this.dataset.page;
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding page
+                    pageSections.forEach(section => section.classList.remove('active'));
+                    document.getElementById(pageId).classList.add('active');
+                    
+                    // Update page title and description
+                    if (pageData[pageId]) {
+                        pageTitle.textContent = pageData[pageId].title;
+                        pageDescription.textContent = pageData[pageId].description;
+                    }
+                });
+            });
+            
+            // New Session button
+            document.getElementById('new-session-btn').addEventListener('click', function() {
+                // Reset to speed test page
+                navItems.forEach(nav => nav.classList.remove('active'));
+                document.querySelector('[data-page="speed-test"]').classList.add('active');
+                
+                pageSections.forEach(section => section.classList.remove('active'));
+                document.getElementById('speed-test').classList.add('active');
+                
+                pageTitle.textContent = 'Typing Speed Test';
+                pageDescription.textContent = 'Test and analyze your typing performance';
+                
+                // Reset any active test
+                resetTest();
+            });
+
+            // ========== TYPING TEST FUNCTIONALITY ==========
+            const typingText = document.getElementById('typing-text');
+            const typingInput = document.getElementById('typing-input');
+            const startTestBtn = document.getElementById('start-test-btn');
+            const resetTestBtn = document.getElementById('reset-test-btn');
+            const durationSelect = document.getElementById('duration-select');
+            const difficultySelect = document.getElementById('difficulty-select');
+            const timeRemaining = document.getElementById('time-remaining');
+            const wordsCount = document.getElementById('words-count');
+            const aiFeedback = document.getElementById('ai-feedback');
+            
+            // Stats elements
+            const currentWpm = document.getElementById('current-wpm');
+            const currentAccuracy = document.getElementById('current-accuracy');
+            const statsWpm = document.getElementById('stats-wpm');
+            const statsAccuracy = document.getElementById('stats-accuracy');
+            const statsChars = document.getElementById('stats-chars');
+            const statsErrors = document.getElementById('stats-errors');
+            const wpmProgress = document.getElementById('wpm-progress');
+            const accuracyProgress = document.getElementById('accuracy-progress');
+            const errorPatterns = document.getElementById('error-patterns');
+            const improvementSuggestions = document.getElementById('improvement-suggestions');
+            const floatingStats = document.getElementById('floating-stats');
+            const floatingWpm = document.getElementById('floating-wpm');
+            const floatingAccuracy = document.getElementById('floating-accuracy');
+            
+            // Test variables
+            let testActive = false;
+            let timer;
+            let timeLeft = 60;
+            let startTime;
+            let currentText = '';
+            let currentMode = 'medium';
+            
+            // Stats
+            let correctChars = 0;
+            let totalChars = 0;
+            let errors = 0;
+            let errorMap = new Map();
+            
+            // Text samples for different difficulty levels
+            const textSamples = {
+                easy: [
+                    "The quick brown fox jumps over the lazy dog. This sentence contains every letter in the alphabet.",
+                    "Programming is the process of creating a set of instructions that tell a computer how to perform a task.",
+                    "Learning to type quickly and accurately is an important skill in today's digital world.",
+                    "Practice makes perfect when it comes to improving your typing speed and accuracy over time."
+                ],
+                medium: [
+                    "JavaScript is a high-level, often just-in-time compiled language that conforms to the ECMAScript specification.",
+                    "Responsive web design makes your web page look good on all devices. It uses only HTML and CSS.",
+                    "The Document Object Model (DOM) is a programming interface for web documents that represents the structure.",
+                    "Asynchronous programming allows a unit of work to run separately from the primary application thread."
+                ],
+                hard: [
+                    "Polymorphism is the ability of an object to take on many forms. The most common use is when a parent class reference refers to a child class object.",
+                    "Cryptographic hash functions are mathematical operations that take input data of any size and produce a fixed-size output string.",
+                    "Quantum computing utilizes quantum mechanical phenomena to perform operations on data at exponentially faster rates than classical computers."
+                ],
+                expert: [
+                    "The juxtaposition of postmodern architectural elements with classical facades creates a dialectical tension that challenges conventional aesthetic paradigms.",
+                    "Epistemological skepticism questions the possibility of knowledge, arguing that our cognitive faculties may be fundamentally unreliable.",
+                    "Quantum entanglement describes a phenomenon where particles remain connected so that actions performed on one affect the other, regardless of distance."
+                ]
+            };
+            
+            // AI Feedback messages
+            const aiMessages = {
+                start: "I'm ready to analyze your typing! Begin the test and I'll provide real-time feedback.",
+                goodStart: "Good start! You're maintaining a steady pace. Try to focus on accuracy as you continue.",
+                speedUp: "You're doing well, but you could increase your speed slightly. Don't sacrifice accuracy though!",
+                slowDown: "You're making several errors. Try slowing down to improve your accuracy first.",
+                excellent: "Excellent performance! You're maintaining both speed and accuracy. Keep it up!",
+                finish: "Test complete! Let me analyze your overall performance..."
+            };
+            
+            // Initialize the typing test functionality
+            function initTypingTest() {
+                // Set up event listeners
+                startTestBtn.addEventListener('click', startTest);
+                resetTestBtn.addEventListener('click', resetTest);
+                typingInput.addEventListener('input', handleTyping);
+                durationSelect.addEventListener('change', updateDuration);
+                difficultySelect.addEventListener('change', updateDifficulty);
+                
+                // Initial setup
+                updateDuration();
+                updateDisplayText();
+                
+                // Show initial AI message
+                updateAIFeedback(aiMessages.start);
+            }
+            
+            // Start the typing test
+            function startTest() {
+                if (testActive) return;
+                
+                testActive = true;
+                startTestBtn.disabled = true;
+                typingInput.disabled = false;
+                typingInput.focus();
+                typingText.classList.add('test-active');
+                
+                // Reset stats
+                correctChars = 0;
+                totalChars = 0;
+                errors = 0;
+                errorMap.clear();
+                updateStats();
+                
+                // Start timer
+                timeLeft = parseInt(durationSelect.value);
+                timeRemaining.textContent = `${timeLeft}s remaining`;
+                startTime = new Date();
+                
+                timer = setInterval(function() {
+                    timeLeft--;
+                    timeRemaining.textContent = `${timeLeft}s remaining`;
+                    
+                    if (timeLeft <= 0) {
+                        endTest();
+                    }
+                }, 1000);
+                
+                // Update display text
+                updateDisplayText();
+                
+                // Update AI feedback
+                updateAIFeedback("Test started! Focus on maintaining a balance between speed and accuracy.");
+                
+                // Show floating stats on mobile
+                if (window.innerWidth < 768) {
+                    floatingStats.classList.remove('hidden');
+                }
+            }
+            
+            // Reset the test
+            function resetTest() {
+                clearInterval(timer);
+                testActive = false;
+                startTestBtn.disabled = false;
+                typingInput.disabled = true;
+                typingInput.value = '';
+                typingText.classList.remove('test-active');
+                
+                // Reset time
+                timeLeft = parseInt(durationSelect.value);
+                timeRemaining.textContent = `${timeLeft}s remaining`;
+                
+                // Reset stats
+                correctChars = 0;
+                totalChars = 0;
+                errors = 0;
+                errorMap.clear();
+                updateStats();
+                
+                // Update display text
+                updateDisplayText();
+                
+                // Update AI feedback
+                updateAIFeedback(aiMessages.start);
+                
+                // Hide floating stats
+                floatingStats.classList.add('hidden');
+            }
+            
+            // End the test and show results
+            function endTest() {
+                clearInterval(timer);
+                testActive = false;
+                startTestBtn.disabled = false;
+                typingInput.disabled = true;
+                typingText.classList.remove('test-active');
+                
+                // Calculate final stats
+                const endTime = new Date();
+                const timeTaken = (endTime - startTime) / 1000 / 60; // in minutes
+                const finalWpm = Math.round((correctChars / 5) / timeTaken);
+                const finalAccuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+                
+                // Update AI feedback with analysis
+                let analysis = "Test complete! ";
+                
+                if (finalWpm < 30) {
+                    analysis += "Your speed is on the beginner level. Focus on practicing regularly to build muscle memory.";
+                } else if (finalWpm < 50) {
+                    analysis += "You're at an intermediate level. Good job! Try to push for 60 WPM with maintained accuracy.";
+                } else if (finalWpm < 80) {
+                    analysis += "Excellent speed! You're typing faster than most people. Keep practicing to reach expert level.";
+                } else {
+                    analysis += "Outstanding! You're typing at an expert level. Consider competing in typing competitions!";
+                }
+                
+                if (finalAccuracy < 90) {
+                    analysis += " Your accuracy needs improvement. Slow down slightly to reduce errors.";
+                } else if (finalAccuracy < 95) {
+                    analysis += " Good accuracy. Try to maintain this while gradually increasing speed.";
+                } else {
+                    analysis += " Your accuracy is excellent! You have great control over your typing.";
+                }
+                
+                updateAIFeedback(analysis);
+                
+                // Generate improvement suggestions
+                generateImprovementSuggestions(finalWpm, finalAccuracy);
+                
+                // Hide floating stats after a delay
+                setTimeout(() => {
+                    floatingStats.classList.add('hidden');
+                }, 3000);
+            }
+            
+            // Handle typing input
+            function handleTyping() {
+                if (!testActive) return;
+                
+                const inputText = typingInput.value;
+                totalChars = inputText.length;
+                
+                // Calculate correct characters and errors
+                correctChars = 0;
+                errors = 0;
+                
+                for (let i = 0; i < inputText.length; i++) {
+                    if (i < currentText.length && inputText[i] === currentText[i]) {
+                        correctChars++;
+                    } else {
+                        errors++;
+                        // Track error patterns
+                        if (i < currentText.length) {
+                            const expectedChar = currentText[i];
+                            const typedChar = inputText[i];
+                            const errorKey = `${expectedChar}->${typedChar}`;
+                            errorMap.set(errorKey, (errorMap.get(errorKey) || 0) + 1);
+                        }
+                    }
+                }
+                
+                // Update stats
+                updateStats();
+                
+                // Update text highlighting
+                updateTextHighlighting(inputText);
+                
+                // Update word count
+                const wordCount = inputText.split(/\s+/).filter(word => word.length > 0).length;
+                wordsCount.textContent = `${wordCount} words`;
+                
+                // Update AI feedback based on performance
+                updateRealTimeAIFeedback();
+                
+                // Check if user has completed the text
+                if (inputText === currentText) {
+                    updateDisplayText();
+                    typingInput.value = '';
+                }
+            }
+            
+            // Update stats display
+            function updateStats() {
+                // Calculate WPM
+                const timeElapsed = (parseInt(durationSelect.value) - timeLeft) / 60; // in minutes
+                const wpm = timeElapsed > 0 ? Math.round((correctChars / 5) / timeElapsed) : 0;
+                
+                // Calculate accuracy
+                const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+                
+                // Update all stat elements
+                currentWpm.textContent = wpm;
+                currentAccuracy.textContent = accuracy + '%';
+                statsWpm.textContent = wpm;
+                statsAccuracy.textContent = accuracy + '%';
+                statsChars.textContent = totalChars;
+                statsErrors.textContent = errors;
+                
+                // Update progress bars
+                wpmProgress.style.width = Math.min(wpm, 100) + '%';
+                accuracyProgress.style.width = accuracy + '%';
+                
+                // Update floating stats
+                floatingWpm.textContent = wpm;
+                floatingAccuracy.textContent = accuracy + '%';
+                
+                // Update error patterns
+                updateErrorPatterns();
+            }
+            
+            // Update text highlighting based on user input
+            function updateTextHighlighting(inputText) {
+                let highlightedText = '';
+                
+                for (let i = 0; i < currentText.length; i++) {
+                    if (i < inputText.length) {
+                        if (inputText[i] === currentText[i]) {
+                            highlightedText += `<span class="highlight-correct">${currentText[i]}</span>`;
+                        } else {
+                            highlightedText += `<span class="highlight-incorrect">${currentText[i]}</span>`;
+                        }
+                    } else if (i === inputText.length) {
+                        highlightedText += `<span class="highlight-current">${currentText[i]}</span>`;
+                    } else {
+                        highlightedText += currentText[i];
+                    }
+                }
+                
+                typingText.innerHTML = highlightedText;
+            }
+            
+            // Update the displayed text based on current mode
+            function updateDisplayText() {
+                const samples = textSamples[currentMode];
+                const randomIndex = Math.floor(Math.random() * samples.length);
+                currentText = samples[randomIndex];
+                
+                // Reset highlighting
+                typingText.innerHTML = currentText;
+                
+                // Clear input if test is active
+                if (testActive) {
+                    typingInput.value = '';
+                }
+            }
+            
+            // Update AI feedback in real-time
+            function updateRealTimeAIFeedback() {
+                const timeElapsed = parseInt(durationSelect.value) - timeLeft;
+                const wpm = timeElapsed > 0 ? Math.round((correctChars / 5) / (timeElapsed / 60)) : 0;
+                const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 100) : 100;
+                
+                let message = "";
+                
+                if (timeElapsed < 10) {
+                    message = aiMessages.goodStart;
+                } else if (wpm < 30 && accuracy > 95) {
+                    message = aiMessages.speedUp;
+                } else if (accuracy < 90) {
+                    message = aiMessages.slowDown;
+                } else if (wpm > 50 && accuracy > 95) {
+                    message = aiMessages.excellent;
+                } else {
+                    message = "You're maintaining a good pace. Keep focusing on both speed and accuracy.";
+                }
+                
+                updateAIFeedback(message);
+            }
+            
+            // Update AI feedback text
+            function updateAIFeedback(message) {
+                aiFeedback.textContent = message;
+            }
+            
+            // Update error patterns display
+            function updateErrorPatterns() {
+                if (errorMap.size === 0) {
+                    errorPatterns.innerHTML = '<div class="text-gray-500">No errors detected yet</div>';
+                    return;
+                }
+                
+                let html = '';
+                const sortedErrors = Array.from(errorMap.entries())
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5);
+                
+                sortedErrors.forEach(([pattern, count]) => {
+                    const [expected, typed] = pattern.split('->');
+                    html += `
+                        <div class="flex justify-between">
+                            <span class="font-mono">"${expected}" → "${typed}"</span>
+                            <span class="text-red-500">${count}x</span>
+                        </div>
+                    `;
+                });
+                
+                errorPatterns.innerHTML = html;
+            }
+            
+            // Generate improvement suggestions
+            function generateImprovementSuggestions(wpm, accuracy) {
+                let suggestions = [];
+                
+                if (wpm < 40) {
+                    suggestions.push("Practice with common words and phrases to build muscle memory");
+                }
+                
+                if (accuracy < 95) {
+                    suggestions.push("Slow down and focus on accuracy before trying to increase speed");
+                }
+                
+                if (errorMap.size > 0) {
+                    const mostCommonError = Array.from(errorMap.entries())[0];
+                    suggestions.push(`Pay special attention to typing "${mostCommonError[0].split('->')[0]}" correctly`);
+                }
+                
+                if (wpm >= 60 && accuracy >= 95) {
+                    suggestions.push("Try the 'Hard' or 'Expert' difficulty levels to challenge yourself further");
+                }
+                
+                if (suggestions.length === 0) {
+                    suggestions.push("Your typing is excellent! Consider practicing with specialized texts in your field");
+                }
+                
+                let html = '';
+                suggestions.forEach(suggestion => {
+                    html += `<div class="flex items-start">
+                        <i class="fas fa-lightbulb text-yellow-500 mt-0.5 mr-2"></i>
+                        <span>${suggestion}</span>
+                    </div>`;
+                });
+                
+                improvementSuggestions.innerHTML = html;
+            }
+            
+            // Update test duration
+            function updateDuration() {
+                timeLeft = parseInt(durationSelect.value);
+                if (!testActive) {
+                    timeRemaining.textContent = `${timeLeft}s remaining`;
+                }
+            }
+            
+            // Update difficulty level
+            function updateDifficulty() {
+                currentMode = difficultySelect.value;
+                if (!testActive) {
+                    updateDisplayText();
+                }
+            }
+            
+            // Initialize everything
+            initTypingTest();
         });
     </script>
 </body>

@@ -2,50 +2,50 @@
 
 A professional typing speed tester with real-time analytics, AI feedback, and comprehensive performance tracking.
 
-![Typing Master](https://img.shields.io/badge/Version-1.0.0-blue)
+![Typing Master](https://img.shields.io/badge/Version-2.0.0-blue)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![Dark Theme](https://img.shields.io/badge/Dark%20Theme-Enabled-success)
 
-## Features
+## 🚀 Features
 
-- 🚀 **Real-time Analytics**: Live WPM and accuracy tracking
-- 🤖 **AI-Powered Feedback**: Intelligent performance analysis
-- 📊 **Multiple Pages**: Speed Test, Progress Analytics, Lessons, and Achievements
-- 🎯 **Difficulty Levels**: Easy, Medium, Hard, and Expert modes
-- 📱 **Responsive Design**: Works on all devices
-- 💾 **Session History**: Track your progress over time
+- **Real-time Analytics**: Live WPM and accuracy tracking
+- **AI-Powered Feedback**: Intelligent performance analysis and suggestions
+- **Multiple Pages**: Speed Test, Progress Analytics, Lessons, and Achievements
+- **Dark/Light Theme**: Professional theme switching with system auto-detection
+- **Difficulty Levels**: Easy, Medium, Hard, and Expert modes
+- **Comprehensive Stats**: Error patterns, progress tracking, and improvement tips
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- **Session History**: Track your typing progress over time
 
-## Quick Start
+## 🎯 Quick Start
 
 1. **Open `index.html`** in your web browser
 2. **Click "Start Test"** to begin typing
 3. **Navigate between sections** using the sidebar
-4. **Track your progress** in real-time
+4. **Customize settings** with the gear icon in the header
+5. **Track your progress** in real-time
 
-## Navigation
+## 📱 Navigation
 
-- **Speed Test**: Main typing test interface
-- **Progress Analytics**: View your typing improvement over time
+- **Speed Test**: Main typing test interface with timer and AI feedback
+- **Progress Analytics**: View your typing improvement over time with charts
 - **Lessons**: Structured typing lessons for skill development
-- **Achievements**: Unlock achievements as you improve
+- **Achievements**: Unlock achievements as you improve with progress tracking
 
-## Technologies
+## ⚙️ Settings
 
-- HTML5, CSS3, JavaScript (ES6+)
-- Tailwind CSS for styling
-- Google Fonts (Inter, Roboto Mono)
-- Font Awesome Icons
+- **Theme**: Light, Dark, or Auto (system preference)
+- **Sound Effects**: Toggle typing sounds
+- **Keyboard Layout**: QWERTY, AZERTY, Colemak, Dvorak
+- **Typing Mode**: Normal, Strict, or Practice modes
+- **Auto-save**: Automatically save your progress
 
-## Browser Support
+## 🛠️ Tech Stack
 
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Styling**: Tailwind CSS with custom CSS variables
+- **Fonts**: Google Fonts (Inter, Roboto Mono)
+- **Icons**: Font Awesome
+- **No Backend Required**: Pure frontend application
 
-## License
-
-MIT License - Contact for personal and commercial use
-
----
-
-**Created by Zhovon** - Professional typing analytics and improvement tools.
+## 📁 Project Structure

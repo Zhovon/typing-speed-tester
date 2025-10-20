@@ -1,23 +1,52 @@
+
+### 2. `package.json`
+```json
 {
   "name": "typing-master-zhovon",
-  "version": "1.0.0",
-  "description": "A professional typing speed tester with AI analytics and progress tracking",
+  "version": "2.0.0",
+  "description": "A professional typing speed tester with AI analytics, dark theme, and comprehensive progress tracking",
   "main": "index.html",
   "scripts": {
     "start": "live-server --port=3000",
-    "dev": "live-server --port=3000 --watch=index.html"
+    "dev": "live-server --port=3000 --watch=index.html",
+    "build": "echo 'No build process needed - pure HTML/CSS/JS application'",
+    "deploy": "echo 'Deploy to GitHub Pages: git push origin main'"
   },
   "keywords": [
     "typing",
     "speed-test",
     "analytics",
     "ai-feedback",
+    "dark-theme",
+    "progress-tracking",
     "javascript",
-    "web-app"
+    "web-app",
+    "touch-typing",
+    "wpm-tracker"
   ],
-  "author": "Zhovon",
+  "author": {
+    "name": "Zhovon",
+    "email": "shahadathoss01@gmail.com",
+    "url": "https://github.com/Zhovon"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zhovon/typing-master-zhovon.git"
+  },
+  "homepage": "https://zhovon.github.io/typing-master-zhovon",
+  "bugs": {
+    "url": "https://github.com/Zhovon/typing-master-zhovon/issues"
+  },
   "devDependencies": {
     "live-server": "^1.2.2"
-  }
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
 }

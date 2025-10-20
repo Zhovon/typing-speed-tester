@@ -170,6 +170,14 @@
             min-width: 200px;
             z-index: 100;
         }
+        
+        .page-section {
+            display: none;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
     </style>
 </head>
 <body class="flex h-screen">
@@ -189,16 +197,16 @@
             </button>
             
             <div class="space-y-1">
-                <div class="nav-item active">
+                <div class="nav-item active" data-page="speed-test">
                     <i class="fas fa-bolt mr-2"></i>Speed Test
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" data-page="progress-analytics">
                     <i class="fas fa-chart-line mr-2"></i>Progress Analytics
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" data-page="lessons">
                     <i class="fas fa-graduation-cap mr-2"></i>Lessons
                 </div>
-                <div class="nav-item">
+                <div class="nav-item" data-page="achievements">
                     <i class="fas fa-trophy mr-2"></i>Achievements
                 </div>
             </div>
@@ -225,8 +233,8 @@
         <header class="border-b border-dadce0 px-6 py-4">
             <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-lg font-medium">Typing Speed Test</h2>
-                    <p class="text-sm text-gray-600">Test and analyze your typing performance</p>
+                    <h2 class="text-lg font-medium" id="page-title">Typing Speed Test</h2>
+                    <p class="text-sm text-gray-600" id="page-description">Test and analyze your typing performance</p>
                 </div>
                 <div class="flex items-center space-x-4">
                     <div class="text-sm">
@@ -246,8 +254,8 @@
         
         <!-- Main Content Area -->
         <div class="flex-1 flex">
-            <!-- Chat/Test Area -->
-            <div class="flex-1 p-6">
+            <!-- Speed Test Page -->
+            <div class="flex-1 p-6 page-section active" id="speed-test">
                 <div class="max-w-4xl mx-auto">
                     <!-- Test Configuration -->
                     <div class="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
@@ -322,7 +330,145 @@
                 </div>
             </div>
             
-            <!-- Stats Panel -->
+            <!-- Progress Analytics Page -->
+            <div class="flex-1 p-6 page-section" id="progress-analytics">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-lg border border-gray-200 p-6">
+                        <h3 class="text-xl font-semibold mb-4">Progress Analytics</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="stats-card p-4">
+                                <h4 class="font-medium mb-3">Weekly Progress</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span>Monday</span>
+                                        <span class="font-medium text-green-600">45 WPM</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Tuesday</span>
+                                        <span class="font-medium text-green-600">48 WPM</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Wednesday</span>
+                                        <span class="font-medium text-blue-600">52 WPM</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Today</span>
+                                        <span class="font-medium text-purple-600">55 WPM</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="stats-card p-4">
+                                <h4 class="font-medium mb-3">Accuracy Trend</h4>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span>Last Week</span>
+                                        <span class="font-medium text-green-600">92%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>This Week</span>
+                                        <span class="font-medium text-blue-600">95%</span>
+                                    </div>
+                                    <div class="progress-bar mt-2">
+                                        <div class="progress-fill bg-green-500" style="width: 95%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Lessons Page -->
+            <div class="flex-1 p-6 page-section" id="lessons">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-lg border border-gray-200 p-6">
+                        <h3 class="text-xl font-semibold mb-4">Typing Lessons</h3>
+                        <div class="space-y-4">
+                            <div class="stats-card p-4 cursor-pointer hover:border-blue-300">
+                                <h4 class="font-medium mb-2">Home Row Basics</h4>
+                                <p class="text-sm text-gray-600 mb-3">Master the home row keys: ASDF JKL;</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500">Beginner • 10 minutes</span>
+                                    <button class="btn-primary text-xs">Start Lesson</button>
+                                </div>
+                            </div>
+                            <div class="stats-card p-4 cursor-pointer hover:border-blue-300">
+                                <h4 class="font-medium mb-2">Top Row Practice</h4>
+                                <p class="text-sm text-gray-600 mb-3">Practice QWERTYUIOP keys</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500">Beginner • 15 minutes</span>
+                                    <button class="btn-primary text-xs">Start Lesson</button>
+                                </div>
+                            </div>
+                            <div class="stats-card p-4 cursor-pointer hover:border-blue-300">
+                                <h4 class="font-medium mb-2">Bottom Row Mastery</h4>
+                                <p class="text-sm text-gray-600 mb-3">ZXCVBNM,./ keys practice</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs text-gray-500">Intermediate • 20 minutes</span>
+                                    <button class="btn-primary text-xs">Start Lesson</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Achievements Page -->
+            <div class="flex-1 p-6 page-section" id="achievements">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-lg border border-gray-200 p-6">
+                        <h3 class="text-xl font-semibold mb-4">Your Achievements</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="stats-card p-4 border-yellow-200 bg-yellow-50">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+                                    <h4 class="font-medium">Speed Demon</h4>
+                                </div>
+                                <p class="text-sm text-gray-600">Reach 60 WPM</p>
+                                <div class="progress-bar mt-2">
+                                    <div class="progress-fill bg-yellow-500" style="width: 75%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">45/60 WPM</div>
+                            </div>
+                            <div class="stats-card p-4 border-green-200 bg-green-50">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-bullseye text-green-500 mr-2"></i>
+                                    <h4 class="font-medium">Accuracy Master</h4>
+                                </div>
+                                <p class="text-sm text-gray-600">Achieve 98% accuracy</p>
+                                <div class="progress-bar mt-2">
+                                    <div class="progress-fill bg-green-500" style="width: 90%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">95%/98% accuracy</div>
+                            </div>
+                            <div class="stats-card p-4 border-blue-200 bg-blue-50">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-infinity text-blue-500 mr-2"></i>
+                                    <h4 class="font-medium">Marathon Typist</h4>
+                                </div>
+                                <p class="text-sm text-gray-600">Complete 10 typing sessions</p>
+                                <div class="progress-bar mt-2">
+                                    <div class="progress-fill bg-blue-500" style="width: 40%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">4/10 sessions</div>
+                            </div>
+                            <div class="stats-card p-4 border-purple-200 bg-purple-50">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-gem text-purple-500 mr-2"></i>
+                                    <h4 class="font-medium">Consistency King</h4>
+                                </div>
+                                <p class="text-sm text-gray-600">Practice for 7 consecutive days</p>
+                                <div class="progress-bar mt-2">
+                                    <div class="progress-fill bg-purple-500" style="width: 30%"></div>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1">2/7 days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Panel (Right Sidebar) -->
             <div class="w-80 border-l border-dadce0 p-6 overflow-y-auto">
                 <h3 class="font-medium mb-4">Performance Metrics</h3>
                 
@@ -397,7 +543,70 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // DOM Elements
+            // Navigation functionality
+            const navItems = document.querySelectorAll('.nav-item');
+            const pageSections = document.querySelectorAll('.page-section');
+            const pageTitle = document.getElementById('page-title');
+            const pageDescription = document.getElementById('page-description');
+            
+            // Page titles and descriptions
+            const pageData = {
+                'speed-test': {
+                    title: 'Typing Speed Test',
+                    description: 'Test and analyze your typing performance'
+                },
+                'progress-analytics': {
+                    title: 'Progress Analytics',
+                    description: 'Track your typing improvement over time'
+                },
+                'lessons': {
+                    title: 'Typing Lessons',
+                    description: 'Structured lessons to improve your skills'
+                },
+                'achievements': {
+                    title: 'Achievements',
+                    description: 'Unlock achievements and track your progress'
+                }
+            };
+            
+            // Navigation event listeners
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const pageId = this.dataset.page;
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding page
+                    pageSections.forEach(section => section.classList.remove('active'));
+                    document.getElementById(pageId).classList.add('active');
+                    
+                    // Update page title and description
+                    if (pageData[pageId]) {
+                        pageTitle.textContent = pageData[pageId].title;
+                        pageDescription.textContent = pageData[pageId].description;
+                    }
+                });
+            });
+            
+            // New Session button
+            document.getElementById('new-session-btn').addEventListener('click', function() {
+                // Reset to speed test page
+                navItems.forEach(nav => nav.classList.remove('active'));
+                document.querySelector('[data-page="speed-test"]').classList.add('active');
+                
+                pageSections.forEach(section => section.classList.remove('active'));
+                document.getElementById('speed-test').classList.add('active');
+                
+                pageTitle.textContent = 'Typing Speed Test';
+                pageDescription.textContent = 'Test and analyze your typing performance';
+                
+                // Reset any active test
+                resetTest();
+            });
+
+            // DOM Elements for typing test
             const typingText = document.getElementById('typing-text');
             const typingInput = document.getElementById('typing-input');
             const startTestBtn = document.getElementById('start-test-btn');
@@ -473,8 +682,8 @@
                 finish: "Test complete! Let me analyze your overall performance..."
             };
             
-            // Initialize the application
-            function init() {
+            // Initialize the typing test functionality
+            function initTypingTest() {
                 // Set up event listeners
                 startTestBtn.addEventListener('click', startTest);
                 resetTestBtn.addEventListener('click', resetTest);
@@ -825,8 +1034,8 @@
                 }
             }
             
-            // Initialize the application
-            init();
+            // Initialize everything
+            initTypingTest();
         });
     </script>
 </body>

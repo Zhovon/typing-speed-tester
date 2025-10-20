@@ -44,7 +44,7 @@ A professional typing speed tester with real-time analytics, AI feedback, and co
 
 ## License
 
-MIT License - Free for personal and commercial use
+MIT License - Contact for personal and commercial use
 
 ---
 
